@@ -1,12 +1,12 @@
 @extends('layouts.dashboard')
 
 @section('content')
-            <header class="mb-3">
-                <a href="#" class="burger-btn d-block d-xl-none">
-                    <i class="bi bi-justify fs-3"></i>
-                </a>
-            </header>
-            
+<header class="mb-3">
+    <a href="#" class="burger-btn d-block d-xl-none">
+        <i class="bi bi-justify fs-3"></i>
+    </a>
+</header>
+
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
@@ -33,65 +33,58 @@
                 </h5>
             </div>
             <div class="card-body">
-            <div id="print-area">
                 <div class="row">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="" class="form-label"><strong>Employee</strong></label>
-                                <p>{{ $payroll->employee->fullname}}</p>
-                            </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"><strong>Employee</strong></label>
+                            <p>{{ $payroll->employee->fullname}}</p>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="" class="form-label"><strong>Salary</strong></label>
-                                <p>{{ number_format($payroll->salary) }}</p>             
-                            </div> 
+                        <div class="mb-3">
+                            <label for="" class="form-label"><strong>Salary</strong></label>
+                            <p>{{ number_format($payroll->salary) }}</p>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="" class="form-label"><strong>Deductions</strong></label>
-                                <p>{{ number_format($payroll->deductions) }}</p>
-                            </div> 
+                        <div class="mb-3">
+                            <label for="" class="form-label"><strong>Deductions</strong></label>
+                            <p>{{ number_format($payroll->deductions) }}</p>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="" class="form-label"><strong>Bonuses</strong></label>
-                                <p>{{ number_format($payroll->bonuses) }}</p>
-                            </div> 
-                        </div> 
+                        <div class="mb-3">
+                            <label for="" class="form-label"><strong>Bonuses</strong></label>
+                            <p>{{ number_format($payroll->bonuses) }}</p>
+                        </div>
+                    </div>
 
-                        <div class="col-md-6">
-                            <div class="mb-3">
-                                <label for="" class="form-label"><strong>Pay Date</strong></label>
-                                <p>{{ \Carbon\Carbon::parse($payroll->pay_date)->format('d F Y') }}</p>
-                            </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="" class="form-label"><strong>Pay Date</strong></label>
+                            <p>{{ \Carbon\Carbon::parse($payroll->pay_date)->format('d F Y') }}</p>
+                        </div>
 
-                            <div class="mb-3">
-                                <label for="" class="form-label"><strong>Net Salary</strong></label>
-                                <p>{{ number_format($payroll->net_salary) }}</p>
-                            </div>
-                        </div>  
+                        <div class="mb-3">
+                            <label for="" class="form-label"><strong>Net Salary</strong></label>
+                            <p>{{ number_format($payroll->net_salary) }}</p>
+                        </div>
                     </div>
                 </div>
+            </div>
+<div class="card-body">
+                </div>
 
+            <div class="card-footer d-flex gap-2">
+                
+                <a href="{{ route('payrolls.index') }}" class="btn btn-secondary">
+                    Back to List
+                </a>
+
+                <a href="{{ route('payroll.download', $payroll->id) }}" class="btn btn-primary">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </a>
+                
             </div>
 
-                <button type="button" id="btn-print" class="btn btn-primary"><span class="bi bi-printer"></span> Print</button>
-                <a href="{{ route('payrolls.index') }}" class="btn btn-secondary">Back to List</a>
-
-            </div>
         </div>
     </section>
 </div>
-
-<script> 
-    document.getElementById('btn-print').addEventListener('click', function() {
-        let printContent = document.getElementById('print-area').innerHTML;
-        let originalContent = document.body.innerHTML;
-
-        document.body.innerHTML = printContent;
-        window.print();
-
-        document.body.innerHTML = originalContent;
-
-    });
-</script>
 @endsection

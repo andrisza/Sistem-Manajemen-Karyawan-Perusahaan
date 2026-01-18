@@ -27,7 +27,7 @@ class RoleController extends Controller
     }
     public function edit(Role $role)
     {
-        return view('roles.edit', compact('roles'));
+        return view('roles.edit', compact('role'));
     }
     public function update(Request $request, Role $role)
     {

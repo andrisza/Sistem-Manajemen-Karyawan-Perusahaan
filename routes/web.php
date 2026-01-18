@@ -17,6 +17,10 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
+    Route::get('/payroll/{id}/download', [PayrollController::class, 'downloadSlip'])->name('payroll.download');
+
+// Route untuk Verifikasi QR Code (Dipanggil saat QR discan)
+    Route::get('/payroll/verify/{id}/{hash}', [PayrollController::class, 'verify'])->name('payroll.verify');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware(['role:HR,Developer,Sales']);
     Route::get('/dashboard/presences', [DashboardController::class, 'presence']);
