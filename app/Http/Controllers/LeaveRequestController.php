@@ -16,15 +16,12 @@ class LeaveRequestController extends Controller
         $leaveRequests = LeaveRequest::where('employee_id', session('employee_id'))->get();
         }
         return view('leave-requests.index', compact('leaveRequests'));
-    }
-
+    }    
     public function create()
     {
         $employees = Employee::all();
-
         return view('leave-requests.create', compact('employees'));
     }
-
     public function store(Request $request)
     {
         if (session('role') == 'HR') {
@@ -37,7 +34,6 @@ class LeaveRequestController extends Controller
             $request->merge([
             'status' => 'pending'
         ]);
-
         LeaveRequest::create($request->all());
         
         } else {
@@ -49,13 +45,10 @@ class LeaveRequestController extends Controller
             'status' => 'pending'
             ]);
         }
-
-
         return redirect()->route('leave-requests.index')->with('success', 'Leave Request Created Successfully');
     }
     public function edit(LeaveRequest $leaveRequest) {
         $employees = Employee::all();
-
         return view ('leave-requests.edit', compact('leaveRequest', 'employees'));
     }
     public function update(Request $request, LeaveRequest $leaveRequest) {
@@ -65,9 +58,7 @@ class LeaveRequestController extends Controller
             'start_date' => 'required|date',
             'end_date' => 'required|date',
         ]);
-
         $leaveRequest->update($request->all());
-
         return redirect()->route('leave-requests.index')->with('success', 'Leave Request updated Successfully');
     }
     public function confirm(int $id) {
@@ -86,8 +77,7 @@ class LeaveRequestController extends Controller
     }
     public function destroy(LeaveRequest $leaveRequest) {
         $leaveRequest->delete();
-
         return redirect()->route('leave-requests.index')->with('success', 'Leave Request deleted Successfully');
     }
-
+    
 }

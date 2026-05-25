@@ -1,11 +1,11 @@
 @extends('layouts.dashboard')
 
 @section('content')
-            <header class="mb-3">
-                <a href="#" class="burger-btn d-block d-xl-none">
-                    <i class="bi bi-justify fs-3"></i>
-                </a>
-            </header>
+<header class="mb-3">
+    <a href="#" class="burger-btn d-block d-xl-none">
+        <i class="bi bi-justify fs-3"></i>
+    </a>
+</header>
             
 <div class="page-heading">
     <div class="page-title">
@@ -28,9 +28,7 @@
     <section class="section">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title">
-                    Edit
-                </h5>
+                <h5 class="card-title">Edit</h5>
             </div>
             <div class="card-body">
 
@@ -52,7 +50,7 @@
 
                 <div class="mb-3">
                     <label for="" class="form-label">Check In</label>
-                    <input type="text" class="form-control datetime" name="check_in" value="{{ old('check_in', $presence->check_in) }}"required>
+                    <input type="text" class="form-control datetime" name="check_in" value="{{ old('check_in', $presence->check_in) }}" required>
                     @error('check_in')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -60,7 +58,7 @@
 
                 <div class="mb-3">
                     <label for="" class="form-label">Check Out</label>
-                    <input type="text" class="form-control datetime" name="check_out" value="{{ old('out', $presence->out) }}" required>
+                    <input type="text" class="form-control datetime" name="check_out" value="{{ old('check_out', $presence->check_out) }}" required>
                     @error('check_out')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -68,7 +66,7 @@
 
                 <div class="mb-3">
                     <label for="" class="form-label">Date</label>
-                    <input type="text" class="form-control date" name="date" value="{{ old('date', $presence->date) }}"required>
+                    <input type="text" class="form-control date" name="date" value="{{ old('date', $presence->date) }}" required>
                     @error('date')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
@@ -94,5 +92,4 @@
         </div>
     </section>
 </div>
-
 @endsection

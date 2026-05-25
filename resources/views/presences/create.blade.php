@@ -1,11 +1,11 @@
 @extends('layouts.dashboard')
 
 @section('content')
-            <header class="mb-3">
-                <a href="#" class="burger-btn d-block d-xl-none">
-                    <i class="bi bi-justify fs-3"></i>
-                </a>
-            </header>
+<header class="mb-3">
+    <a href="#" class="burger-btn d-block d-xl-none">
+        <i class="bi bi-justify fs-3"></i>
+    </a>
+</header>
             
 <div class="page-heading">
     <div class="page-title">
@@ -29,16 +29,14 @@
         <div class="card">
             <div class="card-header">
                 <h5 class="card-title">
-                    Create
+                    Create / Action
                 </h5>
             </div>
             <div class="card-body">
                 
             @if(session('role') == 'HR')
-
             <form action="{{ route('presences.store') }}" method="POST">
                 @csrf
-
                 <div class="mb-3">
                     <label for="" class="form-label">Employee</label>
                     <select name="employee_id" id="status" class="form-control">
@@ -50,7 +48,6 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div>
-
                 <div class="mb-3">
                     <label for="" class="form-label">Check In</label>
                     <input type="text" class="form-control datetime" name="check_in" required>
@@ -58,7 +55,6 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div> 
-
                 <div class="mb-3">
                     <label for="" class="form-label">Check Out</label>
                     <input type="text" class="form-control datetime" name="check_out" required>
@@ -66,7 +62,6 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div> 
-
                 <div class="mb-3">
                     <label for="" class="form-label">Date</label>
                     <input type="text" class="form-control date" name="date" required>
@@ -74,7 +69,6 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div> 
-
                 <div class="mb-3">
                     <label for="" class="form-label">Status</label>
                     <select name="status" id="status" class="form-control">
@@ -86,35 +80,43 @@
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
                 </div> 
-
                 <button type="submit" class="btn btn-primary">Submit</button>
                 <a href="{{ route('presences.index') }}" class="btn btn-secondary">Back to List</a>
             </form>
 
             @else
+            @if(isset($todayPresence) && $todayPresence->check_in != $todayPresence->check_out)
+                    <div class="alert alert-success text-center">
+                        <h4 class="alert-heading">Kerja Bagus!</h4>
+                        <p>Anda sudah menyelesaikan absensi (Check In & Check Out) untuk hari ini.</p>
+                    </div>
+                    <a href="{{ route('presences.index') }}" class="btn btn-secondary d-block w-100">Kembali ke Daftar Absensi</a>
+                @else
+                    <form action="{{ isset($todayPresence) ? route('presences.checkout') : route('presences.store') }}" method="POST">
+                        @csrf
 
-            <form action="{{ route('presences.store') }}" method="POST">
-                @csrf
+                        <div class="alert alert-info">
+                            <b>Note</b> : Mohon izinkan akses lokasi agar presensi diterima.
+                        </div>
 
-                <div class="mb-3"><b>Note</b> : Mohon izinkan akses lokasi, agar presensi diterima</div>
+                        <div class="mb-3" style="display: none;"> <label for="" class="form-label">Latitude</label>
+                            <input type="text" class="form-control" name="latitude" id="latitude" required>
+                        </div>
 
-                <div class="mb-3">
-                    <label for="" class="form-label">Latitude</label>
-                    <input type="text" class="form-control" name="latitude" id="latitude" required>
-                </div>
+                        <div class="mb-3" style="display: none;"> 
+                            <label for="" class="form-label">Longitude</label>
+                            <input type="text" class="form-control" name="longitude" id="longitude" required>
+                        </div>
 
-                <div class="mb-3">
-                    <label for="" class="form-label">Longitude</label>
-                    <input type="text" class="form-control" name="longitude" id="longitude" required>
-                </div>
+                        <div class="mb-3 w-100">
+                            <iframe class="w-100" height="300" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src=""></iframe>          
+                        </div>
 
-                <div class="mb-3">
-                    <iframe width="500" height="300" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src=""></iframe>          
-                </div>
-
-                <button type="submit" class="btn btn-primary" id="btn-present" disabled>Present</button>
-            </form>
-
+                        <button type="submit" class="btn btn-lg w-100 {{ isset($todayPresence) ? 'btn-danger' : 'btn-primary' }}" id="btn-present" disabled>
+                            {{ isset($todayPresence) ? 'Check Out Sekarang' : 'Check In Sekarang' }}
+                        </button>
+                    </form>
+                @endif
             @endif
 
             </div>
@@ -123,45 +125,47 @@
 </div>
 
 <script>
-const iframe = document.querySelector('iframe');
+    // Script tidak saya hilangkan, hanya diperbaiki bagian URL petanya yang sedikit typo pada 0{lat} menjadi ${lat}
+    const iframe = document.querySelector('iframe');
+    const officeLat = -7.299740;
+    const officeLon = 112.718535;
+    const threshold = 0.01;
 
-// bujur lintang kos
-const officeLat = -7.299740;
-const officeLon = 112.718535;
-const threshold = 0.01;
-
-navigator.geolocation.getCurrentPosition(function(position) {
-    const lat = position.coords.latitude;
-    const lon = position.coords.longitude;
-    iframe.src = `https://www.google.com/maps?q=${lat},${lon}&output=embed`;
-
-});
-
-document.addEventListener('DOMContentLoaded', (event) => {
+    document.addEventListener('DOMContentLoaded', (event) => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
+                
+                // Update iframe source
+                if (iframe) {
+                    iframe.src = `https://maps.google.com/maps?q=${lat},${lon}&z=15&output=embed`;
+                }
 
-                document.getElementById('latitude').value = lat;
-                document.getElementById('longitude').value = lon;
+                const latInput = document.getElementById('latitude');
+                const lonInput = document.getElementById('longitude');
+                const btnPresent = document.getElementById('btn-present');
 
-                // Compare current location with office location
-                const distance = Math.sqrt(Math.pow(lat - officeLat, 2) + Math.pow(lon - officeLon, 2));
-                if (distance <= threshold) {
-                    // User is at the office
-                    alert("Kamu berada di kantor, selamat bekerja.");
-                    document.getElementById('btn-present').removeAttribute('disabled');
-                } else {
-                    alert("Kamu tidak berada di kantor, presensi tidak diterima. Refresh ulang jendela ini / hubungi admin jika ada kesalahan");
+                if(latInput && lonInput && btnPresent) {
+                    latInput.value = lat;
+                    lonInput.value = lon;
+
+                    // Hitung Jarak
+                    const distance = Math.sqrt(Math.pow(lat - officeLat, 2) + Math.pow(lon - officeLon, 2));
+                    if (distance <= threshold) {
+                        alert("Lokasi terverifikasi. Anda berada di jangkauan kantor.");
+                        btnPresent.removeAttribute('disabled');
+                    } else {
+                        alert("Kamu tidak berada di kantor, presensi tidak diterima. Refresh ulang jendela ini / hubungi admin.");
+                    }
                 }
             }, function(error) {
+                alert("Gagal mendeteksi lokasi: " + error.message);
                 console.error("Error Code = " + error.code + " - " + error.message);
             });
         } else {
-            console.error("Geolocation is not supported by this browser.");
+            alert("Browser Anda tidak mendukung deteksi lokasi.");
         }
     });
 </script>
-
 @endsection

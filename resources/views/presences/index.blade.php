@@ -1,11 +1,11 @@
 @extends('layouts.dashboard')
 
 @section('content')
-            <header class="mb-3">
-                <a href="#" class="burger-btn d-block d-xl-none">
-                    <i class="bi bi-justify fs-3"></i>
-                </a>
-            </header>
+<header class="mb-3">
+    <a href="#" class="burger-btn d-block d-xl-none">
+        <i class="bi bi-justify fs-3"></i>
+    </a>
+</header>
             
 <div class="page-heading">
     <div class="page-title">
@@ -18,7 +18,7 @@
                 <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Role</li>
+                        <li class="breadcrumb-item active" aria-current="page">Presence</li>
                         <li class="breadcrumb-item active" aria-current="page">Index</li>
                     </ol>
                 </nav>
@@ -28,18 +28,21 @@
     <section class="section">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title">
-                    Presences List
-                </h5>
+                <h5 class="card-title">Presences List</h5>
             </div>
             <div class="card-body">
 
             <div class="d-flex">
-            <a href="{{ route('presences.create') }}" class="btn btn-primary mb-3 ms-auto">New Presence</a>  
+                <a href="{{ route('presences.create') }}" class="btn btn-primary mb-3 ms-auto">
+                    {{ session('role') == 'HR' ? 'New Presence' : 'Lakukan Absensi' }}
+                </a>  
             </div>
 
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
 
                 <table class="table table-striped" id="table1">
@@ -59,20 +62,30 @@
                         @foreach($presences as $presence)
                         <tr>
                             <td>{{ $presence->employee->fullname }}</td>
-                            <td>{{ $presence->check_in }}</td>
-                            <td>{{ $presence->check_out }}</td>
+                            
+                            <td>{{ \Carbon\Carbon::parse($presence->check_in)->format('H:i:s') }}</td>
+                            
+                            <td>
+                                @if($presence->check_in == $presence->check_out)
+                                    <span class="badge bg-warning text-dark">Belum Checkout</span>
+                                @else
+                                    {{ \Carbon\Carbon::parse($presence->check_out)->format('H:i:s') }}
+                                @endif
+                            </td>
+                            
                             <td>{{ $presence->date }}</td>
+                            
                             <td>
                                 @if($presence->status == 'present')
-                                    <span class="text-success">Present</span>
+                                    <span class="text-success fw-bold">Present</span>
                                 @else
-                                    <span class="text-danger">{{ ucfirst($presence->status) }}</span>
+                                    <span class="text-danger fw-bold">{{ ucfirst($presence->status) }}</span>
                                 @endif
-                                </td>
+                            </td>
 
                             <td>
                                 @if(session('role') == 'HR')
-                                    <a href="{{ route('presences.edit', $presence->id) }}"class="btn btn-warning btn-sm">Edit</a>
+                                    <a href="{{ route('presences.edit', $presence->id) }}" class="btn btn-warning btn-sm">Edit</a>
                                     <form action="{{ route('presences.destroy', $presence->id) }}" method="POST" style="display:inline;">
                                         @csrf
                                         @method('DELETE')
@@ -81,7 +94,6 @@
                                         </button>
                                     </form>
                                 @endif
-
                             </td>
                         </tr>
                         @endforeach
@@ -91,5 +103,4 @@
         </div>
     </section>
 </div>
-
 @endsection

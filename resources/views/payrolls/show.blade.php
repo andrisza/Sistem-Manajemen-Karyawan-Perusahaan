@@ -79,7 +79,7 @@
                 </a>
 
                 <a href="{{ route('payroll.download', $payroll->id) }}" class="btn btn-primary">
-                    <i class="fas fa-file-pdf"></i> Download PDF
+                    <i class="fas fa-file-pdf"></i> Download
                 </a>
                 
             </div>

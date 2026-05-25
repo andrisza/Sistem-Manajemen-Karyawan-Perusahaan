@@ -7,55 +7,97 @@ use App\Models\Presence;
 use App\Models\Employee;
 use Carbon\Carbon;
 
-
 class PresenceController extends Controller
 {
     public function index()
     {   
         if (session('role') == 'HR') {
-        $presences = Presence::all();
+            $presences = Presence::latest()->get();
         } else {
-            $presences = Presence::where('employee_id', session('employee_id'))->get();
+            $presences = Presence::where('employee_id', session('employee_id'))->latest()->get();
         }
         return view('presences.index', compact('presences'));
     }
+
     public function create()
     {
         $employees = Employee::all();
+        
+        // Cek apakah karyawan sudah check in hari ini
+        $today = Carbon::now()->format('Y-m-d');
+        $todayPresence = null;
 
-        return view('presences.create', compact('employees'));
+        if (session('role') != 'HR') {
+            $todayPresence = Presence::where('employee_id', session('employee_id'))
+                                     ->where('date', $today)
+                                     ->first();
+        }
+
+        // Kirim $todayPresence ke view agar tombol bisa menyesuaikan
+        return view('presences.create', compact('employees', 'todayPresence'));
     }
+
     public function store(Request $request)
     {
-            if (session('role') == 'HR') {
+        if (session('role') == 'HR') {
             $request->validate([
                 'employee_id' => 'required',
                 'check_in' => 'required',
                 'check_out' => 'required',
                 'date' => 'required|date',
                 'status' => 'required|string',
-                
             ]);
 
             Presence::create($request->all());
         } else {
+            $now = Carbon::now()->format('Y-m-d H:i:s');
+            $today = Carbon::now()->format('Y-m-d');
+
+            // Validasi mencegah karyawan check-in 2x di hari yang sama
+            $exists = Presence::where('employee_id', session('employee_id'))
+                              ->where('date', $today)
+                              ->exists();
+            if($exists) {
+                return redirect()->route('presences.index')->with('error', 'Anda sudah Check In hari ini.');
+            }
+
             Presence::create ([
                 'employee_id' => session('employee_id'),
-                'check_in' => Carbon::now()->format('Y-m-d H:i:s'),
+                'check_in' => $now,
+                'check_out' => $now, // Disamakan sementara dengan check_in untuk menghindari error database NOT NULL
                 'latitude' => $request->latitude,
                 'longitude' => $request->longitude,
-                'date' => Carbon::now()->format('Y-m-d'),
+                'date' => $today,
                 'status' => 'present'
             ]);
-            
         }
-        return redirect()->route('presences.index')->with('success', 'Presence recorded successfully.');
+        return redirect()->route('presences.index')->with('success', 'Check In berhasil dicatat.');
     }
+
+    // METHOD BARU UNTUK PROSES CHECKOUT
+    public function checkout(Request $request)
+    {
+        $today = Carbon::now()->format('Y-m-d');
+        $presence = Presence::where('employee_id', session('employee_id'))
+                            ->where('date', $today)
+                            ->first();
+
+        if ($presence) {
+            $presence->update([
+                'check_out' => Carbon::now()->format('Y-m-d H:i:s') // Timpa nilai sementara dengan jam pulang asli
+            ]);
+            return redirect()->route('presences.index')->with('success', 'Check Out berhasil dicatat.');
+        }
+
+        return redirect()->route('presences.index')->with('error', 'Data Check In hari ini tidak ditemukan.');
+    }
+
     public function edit(Presence $presence)
     {
         $employees = Employee::all();
         return view('presences.edit', compact('presence', 'employees'));
     }
+
     public function update(Request $request, Presence $presence)
     {
         $request->validate([
@@ -69,6 +111,7 @@ class PresenceController extends Controller
         $presence->update($request->all());
         return redirect()->route('presences.index')->with('success', 'Presence updated successfully.');
     }
+
     public function destroy(Presence $presence)
     {
         $presence->delete();

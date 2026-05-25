@@ -15,7 +15,9 @@ class Presence extends Model
         'check_in',
         'check_out',
         'date',
-        'status'
+        'status',
+        'latitude', 
+        'longitude' 
     ];
 
     public function employee()
