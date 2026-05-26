@@ -40,8 +40,8 @@
         <div class="header">
             <div class="header-content">
                 <div class="header-text">
-                    <div class="company-name">PT. HUMAN RESOURCE APP</div>
-                    <div class="address">Jl. Teknologi No. 123, Surabaya, Jawa Timur</div>
+                    <div class="company-name">PT. NUSANTARA HUMAN CAPITAL</div>
+                    <div class="address">Jl. Teknologi No. 123, Surabaya, Jawa Timur 60111</div>
                 </div>
             </div>
         </div>
@@ -141,7 +141,7 @@
         </div>
 
         <div class="footer">
-            HRIS SYSTEM
+            PT. Nusantara Human Capital — Hiro
         </div>
     </div>
 </body>

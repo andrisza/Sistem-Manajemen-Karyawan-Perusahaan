@@ -30,12 +30,6 @@
     <section class="section">
         <div class="card">
             
-            @if(session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-            @endif
-
             <div class="card-body">
 
                 <form action="{{ route('leave-requests.update', $leaveRequest->id) }}" method="POST">

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Aktivasi Akun HRIS</title>
+    <title>Aktivasi Akun — Hiro</title>
     <style>
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 0; padding-top: 40px; }
         .email-card { max-width: 550px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -18,11 +18,11 @@
 <body>
     <div class="email-card">
         <div class="email-header">
-            <h1>HRIS SYSTEM</h1>
+            <h1>Hiro</h1>
         </div>
         <div class="email-body">
             <h2>Halo, {{ $user->name }}!</h2>
-            <p>Selamat bergabung di perusahaan! Akun HRIS Anda telah berhasil disiapkan oleh tim HRD.</p>
+            <p>Selamat bergabung di <strong>PT. Nusantara Human Capital</strong>! Akun Hiro Anda telah berhasil disiapkan oleh tim HRD.</p>
             <p>Untuk mulai menggunakan sistem, silakan aktifkan akun Anda dan buat kata sandi baru secara mandiri dengan mengklik tombol di bawah ini:</p>
             
             <div style="text-align: center;">
@@ -36,7 +36,7 @@
             <p>Terima kasih,<br><strong>Tim HRD Perusahaan</strong></p>
         </div>
         <div class="email-footer">
-            &copy; {{ date('Y') }} HRIS Perusahaan. All rights reserved.<br>
+            &copy; {{ date('Y') }} PT. Nusantara Human Capital — Hiro. All rights reserved.<br>
             Mohon tidak membalas email otomatis ini.
         </div>
     </div>

@@ -40,10 +40,6 @@
                 @endif
             </div>
 
-            @if(session('success'))
-                <div class="alert alert-success">{{ session('success') }}</div>
-            @endif
-
                 <table class="table table-striped" id="table1">
                     <thead>
                         <tr>

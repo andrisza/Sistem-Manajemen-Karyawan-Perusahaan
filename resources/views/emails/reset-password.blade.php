@@ -1,7 +1,7 @@
 <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f2f7ff; padding: 40px 20px; text-align: center;">
     <div style="max-width: 480px; margin: 0 auto; background-color: #ffffff; padding: 40px 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
         
-        <h1 style="color: #435ebe; font-size: 28px; margin-top: 0; margin-bottom: 20px; font-weight: 800; letter-spacing: 1px;">HRIS</h1>
+        <div style="font-size: 26px; font-weight: 800; color: #1e2d5a; margin-bottom: 20px; letter-spacing: -0.5px;">h<span style="color:#435ebe;">i</span>ro</div>
         
         <h2 style="color: #333333; font-size: 20px; margin-bottom: 15px;">Atur Ulang Password</h2>
         <p style="color: #555555; font-size: 15px; line-height: 1.6; margin-bottom: 30px;">

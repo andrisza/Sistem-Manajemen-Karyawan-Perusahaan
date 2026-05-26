@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 44" width="110" height="44">
+  <!-- Circle icon mark -->
+  <circle cx="22" cy="22" r="20" fill="#435ebe"/>
+  <!-- H lettermark: 3 rects, no font dependency -->
+  <rect x="11" y="11" width="5" height="22" fill="white"/>
+  <rect x="27" y="11" width="5" height="22" fill="white"/>
+  <rect x="11" y="19" width="21" height="5" fill="white"/>
+  <!-- Wordmark: lowercase, tight tracking -->
+  <text x="50" y="30" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" letter-spacing="-0.5" fill="#1e2d5a">hiro</text>
+</svg>

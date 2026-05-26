@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - HRIS</title>
+    <title>Login — Hiro</title>
+    <link rel="icon" href="/images/logo-icon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* CSS RESET & VARIABLES */
@@ -92,8 +93,8 @@
 <body>
 
     <div class="auth-card">
-        <div class="auth-logo">
-            <h1>HRIS</h1>
+        <div class="auth-logo" style="text-align:center;margin-bottom:28px;">
+            <img src="{{ asset('images/logo.svg') }}" alt="Hiro" style="height:46px;display:inline-block;">
         </div>
 
         <div class="auth-header">
@@ -101,11 +102,6 @@
             <p>Masuk dengan akun terdaftar Anda.</p>
         </div>
 
-        @if (session('status'))
-            <div style="color: #2d8f56; background: #e6f7ed; padding: 10px; border-radius: 6px; margin-bottom: 15px; font-size: 0.9rem;">
-                {{ session('status') }}
-            </div>
-        @endif
 
         <form method="POST" action="{{ route('login') }}">
             @csrf
@@ -140,5 +136,6 @@
         </form>
     </div>
 
+@include('components.toast-notification')
 </body>
 </html>

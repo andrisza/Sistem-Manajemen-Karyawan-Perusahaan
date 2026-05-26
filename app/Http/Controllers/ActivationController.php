@@ -12,9 +12,15 @@ class ActivationController extends Controller
 {
     public function showForm(Request $request, User $user)
     {
-        // Cek apakah URL valid/belum kedaluwarsa
         if (!$request->hasValidSignature()) {
             abort(401, 'Tautan aktivasi tidak valid atau sudah kedaluwarsa.');
+        }
+
+        // Jika ada sesi login aktif (misal HR admin), logout dulu agar form aktivasi bisa tampil
+        if (Auth::check()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
         }
 
         return view('auth.activate', compact('user'));

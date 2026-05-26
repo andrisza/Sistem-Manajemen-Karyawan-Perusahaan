@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lupa Password - HRIS</title>
+    <title>Lupa Password — Hiro</title>
+    <link rel="icon" href="/images/logo-icon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         /* CSS RESET & VARIABLES (SAMA DENGAN LOGIN) */
@@ -91,8 +92,8 @@
 <body>
 
     <div class="auth-card">
-        <div class="auth-logo">
-            <h1>HRIS</h1>
+        <div class="auth-logo" style="text-align:center;margin-bottom:28px;">
+            <img src="{{ asset('images/logo.svg') }}" alt="Hiro" style="height:46px;display:inline-block;">
         </div>
 
         <div class="auth-header">
@@ -100,11 +101,6 @@
             <p>Masukkan email Anda. Kami akan mengirimkan link untuk mereset password akun Anda.</p>
         </div>
 
-        @if (session('status'))
-            <div style="color: #2d8f56; background: #e6f7ed; padding: 12px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; border: 1px solid #2d8f56;">
-                {{ session('status') }}
-            </div>
-        @endif
 
         <form method="POST" action="{{ route('password.email') }}">
             @csrf
@@ -125,5 +121,6 @@
         </form>
     </div>
 
+@include('components.toast-notification')
 </body>
 </html>

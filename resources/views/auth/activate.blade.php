@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aktivasi Akun - HRIS</title>
+    <title>Aktivasi Akun — Hiro</title>
+    <link rel="icon" href="/images/logo-icon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -100,7 +101,9 @@
 <body>
 
 <div class="auth-card">
-    <div class="auth-logo">HRIS</div>
+    <div class="auth-logo" style="font-size:0;">
+        <img src="{{ asset('images/logo.svg') }}" alt="Hiro" style="height:40px;display:block;margin:0 auto 20px;">
+    </div>
     
     <h4 class="auth-title">Aktivasi Akun</h4>
     <p class="auth-subtitle">Halo <strong>{{ $user->name }}</strong>, silakan buat password baru Anda untuk mengaktifkan akun login.</p>
@@ -149,5 +152,6 @@
     }
 </script>
 
+@include('components.toast-notification')
 </body>
 </html>

@@ -24,19 +24,19 @@ require __DIR__.'/auth.php';
 // =========================================================================
 // KAMAR PUBLIK (Bisa diakses oleh karyawan yang BELUM LOGIN / GUEST)
 // =========================================================================
-Route::middleware('guest')->group(function () {
-    
-    // Fitur Aktivasi Akun
-    Route::get('/activate/{user}', [ActivationController::class, 'showForm'])->name('activation.form')->middleware('signed');
-    Route::post('/activate/{user}', [ActivationController::class, 'activate'])->name('activation.submit');
+// Fitur Aktivasi Akun (publik — tidak butuh guest/auth, URL signed sudah validasi keamanan)
+Route::get('/activate/{user}', [ActivationController::class, 'showForm'])->name('activation.form')->middleware('signed');
+Route::post('/activate/{user}', [ActivationController::class, 'activate'])->name('activation.submit');
 
-    // Fitur Lupa Password 
+Route::middleware('guest')->group(function () {
+
+    // Fitur Lupa Password
     // (Karena diletakkan di bawah require auth.php, controller ini yang akan menang dan error $token PASTI HILANG)
     Route::get('/forgot-password', [ResetPasswordController::class, 'showForgotForm'])->name('password.request');
     Route::post('/forgot-password', [ResetPasswordController::class, 'sendResetLink'])->name('password.email');
     Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
     Route::post('/reset-password', [ResetPasswordController::class, 'updatePassword'])->name('password.update');
-    
+
 });
 
 

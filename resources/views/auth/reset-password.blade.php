@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buat Password Baru - HRIS</title>
+    <title>Buat Password Baru — Hiro</title>
+    <link rel="icon" href="/images/logo-icon.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -78,7 +79,9 @@
 <body>
 
 <div class="auth-card">
-    <div class="auth-logo">HRIS</div>
+    <div class="auth-logo" style="font-size:0;">
+        <img src="{{ asset('images/logo.svg') }}" alt="Hiro" style="height:40px;display:block;margin:0 auto 20px;">
+    </div>
     <h4 class="text-dark fw-bold mb-1">Buat Password Baru</h4>
     <p class="text-muted small mb-4">Silakan masukkan kata sandi baru Anda di bawah ini.</p>
 
@@ -122,5 +125,6 @@
     </form>
 </div>
 
+@include('components.toast-notification')
 </body>
 </html>

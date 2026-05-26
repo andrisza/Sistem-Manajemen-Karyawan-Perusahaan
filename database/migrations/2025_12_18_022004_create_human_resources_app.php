@@ -70,8 +70,8 @@ return new class extends Migration
         Schema::create('presences', function (Blueprint $table) {
             $table->id();
             $table->foreignId('employee_id')->constrained('employees');
-            $table->date('check_in');
-            $table->date('check_out');
+            $table->dateTime('check_in');
+            $table->dateTime('check_out');
             $table->date('date');
             $table->string('status');
             $table->timestamps();

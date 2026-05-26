@@ -36,12 +36,6 @@
                     <a href="{{ route('leave-requests.create') }}" class="btn btn-primary mb-3 ms-auto">New Leave Request</a>
                 </div>
 
-                @if(session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                
                 <table class="table table-striped" id="table1">
                     <thead>
                         <tr>
