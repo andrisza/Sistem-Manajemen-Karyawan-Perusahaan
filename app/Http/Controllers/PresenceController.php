@@ -42,13 +42,24 @@ class PresenceController extends Controller
         if (session('role') == 'HR') {
             $request->validate([
                 'employee_id' => 'required',
-                'check_in' => 'required',
-                'check_out' => 'required',
-                'date' => 'required|date',
-                'status' => 'required|string',
+                'check_in'    => 'required',
+                'check_out'   => 'required',
+                'date'        => 'required|date',
+                'status'      => 'required|string',
             ]);
 
-            Presence::create($request->all());
+            // Gabungkan field date + time menjadi datetime lengkap
+            $date     = $request->date;
+            $checkIn  = $date . ' ' . $request->check_in;
+            $checkOut = $date . ' ' . $request->check_out;
+
+            Presence::create([
+                'employee_id' => $request->employee_id,
+                'check_in'    => $checkIn,
+                'check_out'   => $checkOut,
+                'date'        => $date,
+                'status'      => $request->status,
+            ]);
         } else {
             $now = Carbon::now()->format('Y-m-d H:i:s');
             $today = Carbon::now()->format('Y-m-d');
@@ -102,13 +113,22 @@ class PresenceController extends Controller
     {
         $request->validate([
             'employee_id' => 'required',
-            'check_in' => 'required',
-            'check_out' => 'required',
-            'date' => 'required|date',
-            'status' => 'required|string',
+            'check_in'    => 'required',
+            'check_out'   => 'required',
+            'date'        => 'required|date',
+            'status'      => 'required|string',
         ]);
 
-        $presence->update($request->all());
+        $date = $request->date;
+
+        $presence->update([
+            'employee_id' => $request->employee_id,
+            'check_in'    => $date . ' ' . $request->check_in,
+            'check_out'   => $date . ' ' . $request->check_out,
+            'date'        => $date,
+            'status'      => $request->status,
+        ]);
+
         return redirect()->route('presences.index')->with('success', 'Presence updated successfully.');
     }
 

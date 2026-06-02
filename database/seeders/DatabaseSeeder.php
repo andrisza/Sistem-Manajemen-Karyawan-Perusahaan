@@ -79,25 +79,17 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // ── 4. USER ACCOUNTS ─────────────────────────────────────────
-        // Hanya buat user untuk employee yang memiliki role sistem
-        $systemRoles = ['HR', 'Developer', 'Sales'];
-        $userRows = [];
+        // ── 4. USER ACCOUNTS (semua 20 employee) ─────────────────────
         foreach ($employees as $i => $emp) {
-            if (in_array($empData[$i]['role']->title, $systemRoles)) {
-                $userRows[] = [
-                    'name'              => $emp->fullname,
-                    'email'             => $emp->email,
-                    'password'          => Hash::make('password'),
-                    'employee_id'       => $emp->id,
-                    'role_id'           => $empData[$i]['role']->id,
-                    'email_verified_at' => Carbon::now(),
-                    'created_at'        => Carbon::now(),
-                    'updated_at'        => Carbon::now(),
-                ];
-            }
+            \App\Models\User::create([
+                'name'              => $emp->fullname,
+                'email'             => $emp->email,
+                'password'          => 'password',
+                'employee_id'       => $emp->id,
+                'role_id'           => $empData[$i]['role']->id,
+                'email_verified_at' => Carbon::now(),
+            ]);
         }
-        DB::table('users')->insert($userRows);
 
         // ── 5. PAYROLL (10 record — 1 per karyawan, 10 karyawan pertama) ──
         $payDate = Carbon::now()->startOfMonth()->addDays(24)->toDateString();
@@ -183,17 +175,19 @@ class DatabaseSeeder extends Seeder
         // ── OUTPUT ───────────────────────────────────────────────────
         $this->command->info('');
         $this->command->info('✅  Hiro — Data berhasil dibuat!');
-        $this->command->info('════════════════════════════════════════════');
+        $this->command->info('════════════════════════════════════════════════════════');
         $this->command->info('  Perusahaan  : PT. Nusantara Human Capital');
         $this->command->info('  Departments : 5  |  Roles : 10  |  Employees : 20');
-        $this->command->info('  Payroll     : 10 record');
-        $this->command->info('  Presences   : 10 record');
-        $this->command->info('  Password    : password (semua akun)');
-        $this->command->info('────────────────────────────────────────────');
-        $this->command->info('  HR Admin    : dewi.anggraeni@hiro.co.id');
-        $this->command->info('  Developer   : evan.prasetyo@hiro.co.id');
-        $this->command->info('  Sales       : bambang.setiawan@hiro.co.id');
-        $this->command->info('════════════════════════════════════════════');
+        $this->command->info('  Users       : 20 akun  |  Password : password');
+        $this->command->info('  Payroll     : 10  |  Presences : 10  |  Tasks : 5');
+        $this->command->info('────────────────────────────────────────────────────────');
+        $this->command->info('  Contoh login:');
+        $this->command->info('  [HR]       dewi.anggraeni@hiro.co.id');
+        $this->command->info('  [Dev]      evan.prasetyo@hiro.co.id');
+        $this->command->info('  [Sales]    bambang.setiawan@hiro.co.id');
+        $this->command->info('  [Finance]  kartika.sari@hiro.co.id');
+        $this->command->info('  [Designer] gita.cahyani@hiro.co.id');
+        $this->command->info('════════════════════════════════════════════════════════');
         $this->command->info('');
     }
 }

@@ -50,19 +50,21 @@
 
                 <div class="mb-3">
                     <label for="" class="form-label">Check In</label>
-                    <input type="text" class="form-control datetime" name="check_in" value="{{ old('check_in', $presence->check_in) }}" required>
+                    <input type="text" class="form-control time-only" name="check_in"
+                        value="{{ old('check_in', \Carbon\Carbon::parse($presence->check_in)->format('H:i:s')) }}" required>
                     @error('check_in')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
-                </div> 
+                </div>
 
                 <div class="mb-3">
                     <label for="" class="form-label">Check Out</label>
-                    <input type="text" class="form-control datetime" name="check_out" value="{{ old('check_out', $presence->check_out) }}" required>
+                    <input type="text" class="form-control time-only" name="check_out"
+                        value="{{ old('check_out', \Carbon\Carbon::parse($presence->check_out)->format('H:i:s')) }}" required>
                     @error('check_out')
                         <div class="invalid-feedback">{{ $message }}</div>
                     @enderror
-                </div> 
+                </div>
 
                 <div class="mb-3">
                     <label for="" class="form-label">Date</label>

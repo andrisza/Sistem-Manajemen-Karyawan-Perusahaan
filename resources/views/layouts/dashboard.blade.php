@@ -67,101 +67,64 @@
             <ul class="menu">
                 <li class="sidebar-title">Menu</li>
 
-                @if (session('role') === 'HR')
-
+                {{-- Menu Umum — tampil untuk SEMUA role --}}
                 <li class="sidebar-item {{ request()->is('dashboard') ? 'active' : '' }}">
-                    <a href="{{ url('/dashboard')}}" class='sidebar-link'>
+                    <a href="{{ url('/dashboard') }}" class="sidebar-link">
                         <i class="bi bi-grid-fill"></i>
                         <span>Dashboard</span>
                     </a>
-                </li>   
-                <li
-                    class="sidebar-item {{ request()->is('tasks') ? 'active' : '' }}">
-                    <a href="{{ url('/tasks')}}" class='sidebar-link'>
+                </li>
+
+                <li class="sidebar-item {{ request()->is('tasks') ? 'active' : '' }}">
+                    <a href="{{ url('/tasks') }}" class="sidebar-link">
                         <i class="bi bi-check-circle-fill"></i>
-                    <span>Tasks</span>
+                        <span>Tasks</span>
                     </a>
-                </li> 
-                <li
-                    class="sidebar-item {{ request()->is('employees') ? 'active' : '' }}">
-                        <a href="{{ url('/employees')}}" class='sidebar-link'>
-                            <i class="bi bi-people-fill"></i>
+                </li>
+
+                <li class="sidebar-item {{ request()->is('presences') ? 'active' : '' }}">
+                    <a href="{{ url('/presences') }}" class="sidebar-link">
+                        <i class="bi bi-table"></i>
+                        <span>Presences</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item {{ request()->is('payrolls') ? 'active' : '' }}">
+                    <a href="{{ url('/payrolls') }}" class="sidebar-link">
+                        <i class="bi bi-currency-dollar"></i>
+                        <span>Payrolls</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item {{ request()->is('leave-requests') ? 'active' : '' }}">
+                    <a href="{{ url('/leave-requests') }}" class="sidebar-link">
+                        <i class="bi bi-shift-fill"></i>
+                        <span>Leave Requests</span>
+                    </a>
+                </li>
+
+                {{-- Menu Manajemen — hanya tampil untuk role HR --}}
+                @if(session('role') === 'HR')
+                <li class="sidebar-item {{ request()->is('employees') ? 'active' : '' }}">
+                    <a href="{{ url('/employees') }}" class="sidebar-link">
+                        <i class="bi bi-people-fill"></i>
                         <span>Employees</span>
                     </a>
                 </li>
-                <li
-                    class="sidebar-item {{ request()->is('departments') ? 'active' : '' }}">
-                        <a href="{{ url('/departments')}}" class='sidebar-link'>
+
+                <li class="sidebar-item {{ request()->is('departments') ? 'active' : '' }}">
+                    <a href="{{ url('/departments') }}" class="sidebar-link">
                         <i class="bi bi-briefcase"></i>
-                    <span>Departments</span>
-                </a>
+                        <span>Departments</span>
+                    </a>
                 </li>
-                <li
-                    class="sidebar-item {{ request()->is('roles') ? 'active' : '' }}">
-                        <a href="{{ url('/roles')}}" class='sidebar-link'>
+
+                <li class="sidebar-item {{ request()->is('roles') ? 'active' : '' }}">
+                    <a href="{{ url('/roles') }}" class="sidebar-link">
                         <i class="bi bi-tag"></i>
                         <span>Roles</span>
                     </a>
                 </li>
-                <li
-                    class="sidebar-item {{ request()->is('presences') ? 'active' : '' }}">
-                    <a href="{{ url('/presences')}}" class='sidebar-link'>
-                        <i class="bi bi-table"></i>
-                        <span>Presences</span>
-                    </a>
-                </li>
-                    <li
-                    class="sidebar-item {{ request()->is('payrolls') ? 'active' : '' }}">
-                    <a href="{{ url('/payrolls')}}" class='sidebar-link'>
-                        <i class="bi bi-currency-dollar"></i>
-                        <span>Payrolls</span>
-                    </a>
-                    </li>
-                    <li
-                    class="sidebar-item {{ request()->is('leave-requests') ? 'active' : '' }}">
-                    <a href="{{ url('/leave-requests')}}" class='sidebar-link'>
-                        <i class="bi bi-shift-fill"></i>
-                        <span>Leave Requests</span>
-                    </a>
-                </li>
-                @endif
-
-                @if(in_array(session('role'), ['Developer', 'Sales']))
-                    <li class="sidebar-item {{ request()->is('dashboard') ? 'active' : '' }} ">
-                        <a href="{{ url('/dashboard')}}" class='sidebar-link'>
-                            <i class="bi bi-grid-fill"></i>
-                        <span>Dashboard</span>
-                        </a>
-                    </li>   
-                    <li
-                    class="sidebar-item {{ request()->is('tasks') ? 'active' : '' }}">
-                        <a href="{{ url('/tasks')}}" class='sidebar-link'>
-                        <i class="bi bi-check-circle-fill"></i>
-                        <span>Tasks</span>
-                        </a>
-                    </li>
-                    
-                <li
-                    class="sidebar-item {{ request()->is('presences') ? 'active' : '' }}">
-                    <a href="{{ url('/presences')}}" class='sidebar-link'>
-                        <i class="bi bi-table"></i>
-                        <span>Presences</span>
-                    </a>
-                </li>
-                    <li
-                    class="sidebar-item {{ request()->is('payrolls') ? 'active' : '' }}">
-                    <a href="{{ url('/payrolls')}}" class='sidebar-link'>
-                        <i class="bi bi-currency-dollar"></i>
-                        <span>Payrolls</span>
-                    </a>                
-                    </li>
-                    <li
-                    class="sidebar-item {{ request()->is('leave-requests') ? 'active' : '' }}">
-                    <a href="{{ url('/leave-requests')}}" class='sidebar-link'>
-                        <i class="bi bi-shift-fill"></i>
-                        <span>Leave Requests</span>
-                    </a>
-                    </li>              
                 @endif
 
                     <li
@@ -210,6 +173,14 @@
         time_24hr: true,
     });
 
+    let timeOnly = flatpickr('.time-only', {
+        enableTime: true,
+        noCalendar: true,
+        enableSeconds: true,
+        dateFormat: "H:i:S",
+        time_24hr: true,
+    });
+
     var ctxBar = document.getElementById('presence').getContext('2d');
     var myBar = new Chart(ctxBar, {
         type: "bar",
@@ -223,9 +194,9 @@
             }]
         },
         options: {
-                responsive: true, 
-                maintainAspectRatio: false, // 
-                plugins: { // Chart.js v3/v4 menggunakan 'plugins' untuk title
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
                     title: {
                         display: true,
                         text: 'Latest Presence'
@@ -246,7 +217,6 @@
         fetch ('/dashboard/presences')
         .then(response => response.json())
         .then((output) => {
-            console.log(output);
             myBar.data.datasets = [
                 {
                 label: 'Total',
@@ -262,5 +232,117 @@
 </script>
 
 @include('components.toast-notification')
+
+{{-- Modal Konfirmasi Logout --}}
+<div id="logout-modal" style="
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    background:rgba(0,0,0,0.45);
+    align-items:center;
+    justify-content:center;
+">
+    <div style="
+        background:#fff;
+        border-radius:14px;
+        padding:36px 32px 28px;
+        width:100%;
+        max-width:380px;
+        box-shadow:0 20px 60px rgba(0,0,0,0.2);
+        text-align:center;
+        animation:logoutFadeIn .2s ease;
+    ">
+        <div style="
+            width:56px;height:56px;
+            background:#fff3cd;
+            border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            margin:0 auto 18px;
+        ">
+            <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" fill="#f59e0b" viewBox="0 0 16 16">
+                <path d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/>
+                <path d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708z"/>
+            </svg>
+        </div>
+        <h5 style="font-weight:700;color:#1e2d5a;margin-bottom:8px;">Keluar dari Sistem?</h5>
+        <p style="color:#6b7280;font-size:14px;margin-bottom:28px;">Sesi Anda akan diakhiri. Pastikan semua pekerjaan sudah tersimpan.</p>
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <button id="logout-cancel" style="
+                flex:1;padding:10px;border:1.5px solid #e5e7eb;
+                border-radius:8px;background:#fff;
+                color:#374151;font-weight:600;font-size:14px;
+                cursor:pointer;transition:background .15s;
+            ">Batal</button>
+            <button id="logout-confirm" style="
+                flex:1;padding:10px;border:none;
+                border-radius:8px;background:#435ebe;
+                color:#fff;font-weight:600;font-size:14px;
+                cursor:pointer;transition:background .15s;
+            ">Ya, Keluar</button>
+        </div>
+    </div>
+</div>
+
+<style>
+@keyframes logoutFadeIn {
+    from { opacity:0; transform:scale(.95); }
+    to   { opacity:1; transform:scale(1); }
+}
+</style>
+
+<script>
+(function () {
+    const modal       = document.getElementById('logout-modal');
+    const btnConfirm  = document.getElementById('logout-confirm');
+    const btnCancel   = document.getElementById('logout-cancel');
+    let pendingAction = null; // simpan href atau form yang akan dieksekusi
+
+    function showModal(action) {
+        pendingAction = action;
+        modal.style.display = 'flex';
+    }
+
+    function hideModal() {
+        modal.style.display = 'none';
+        pendingAction = null;
+    }
+
+    // Tutup modal saat klik area gelap di luar kotak
+    modal.addEventListener('click', function (e) {
+        if (e.target === modal) hideModal();
+    });
+
+    btnCancel.addEventListener('click', hideModal);
+
+    btnConfirm.addEventListener('click', function () {
+        if (!pendingAction) return;
+        if (typeof pendingAction === 'string') {
+            window.location.href = pendingAction;
+        } else {
+            pendingAction.submit();
+        }
+        hideModal();
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Intercept semua link logout
+        document.querySelectorAll('a[href*="logout"]').forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                e.preventDefault();
+                showModal(el.href);
+            });
+        });
+
+        // Intercept semua form logout
+        document.querySelectorAll('form[action*="logout"]').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                showModal(form);
+            });
+        });
+    });
+})();
+</script>
 </body>
 </html>

@@ -12,8 +12,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'role' => \App\Http\Middleware\CheckRole::class,
+            'role'             => \App\Http\Middleware\CheckRole::class,
+            'set.session.role' => \App\Http\Middleware\SetSessionRole::class,
         ]);
+
+        // Jalankan SetSessionRole di semua route web yang sudah auth
+        $middleware->appendToGroup('web', \App\Http\Middleware\SetSessionRole::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

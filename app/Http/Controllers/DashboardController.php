@@ -47,11 +47,9 @@ class DashboardController extends Controller
     }
     
     public function presence() {
-        // KODE LAMA ANDA: Disertai filter agar Chart menyesuaikan yang login
         $query = Presence::where('status', 'present')
                          ->whereYear('date', date('Y'));
-                         
-        // TAMBAHAN: Jika yang login bukan HR, grafik hanya memuat absensi pribadi miliknya
+
         if (session('role') != 'HR') {
             $query->where('employee_id', session('employee_id'));
         }
@@ -63,7 +61,6 @@ class DashboardController extends Controller
 
         $data = [];
 
-        // 2. Looping paksa dari bulan 1 sampai 12
         for ($i = 1; $i <= 12; $i++) {
             $data[] = isset($presences[$i]) ? $presences[$i] : 0;
         }
