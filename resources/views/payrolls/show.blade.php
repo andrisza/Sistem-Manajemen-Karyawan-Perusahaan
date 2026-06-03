@@ -1,3 +1,4 @@
+{{-- Halaman detail slip gaji — berisi ringkasan dan tombol unduh PDF --}}
 @extends('layouts.dashboard')
 
 @section('content')
@@ -25,19 +26,21 @@
             </div>
         </div>
     </div>
+
     <section class="section">
         <div class="card">
             <div class="card-header">
-                <h5 class="card-title">
-                    Detail
-                </h5>
+                <h5 class="card-title">Detail</h5>
             </div>
+
+            {{-- Menampilkan detail data gaji dari variabel $payroll --}}
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"><strong>Employee</strong></label>
-                            <p>{{ $payroll->employee->fullname}}</p>
+                            {{-- Mengakses nama karyawan via relasi employee --}}
+                            <p>{{ $payroll->employee->fullname }}</p>
                         </div>
 
                         <div class="mb-3">
@@ -59,31 +62,28 @@
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label for="" class="form-label"><strong>Pay Date</strong></label>
+                            {{-- Format tanggal: "01 January 2025" --}}
                             <p>{{ \Carbon\Carbon::parse($payroll->pay_date)->format('d F Y') }}</p>
                         </div>
 
                         <div class="mb-3">
                             <label for="" class="form-label"><strong>Net Salary</strong></label>
+                            {{-- Net salary = salary + bonuses - deductions (dihitung di controller saat input) --}}
                             <p>{{ number_format($payroll->net_salary) }}</p>
                         </div>
                     </div>
                 </div>
             </div>
-<div class="card-body">
-                </div>
+            <div class="card-body"></div>
 
             <div class="card-footer d-flex gap-2">
-                
-                <a href="{{ route('payrolls.index') }}" class="btn btn-secondary">
-                    Back to List
-                </a>
+                <a href="{{ route('payrolls.index') }}" class="btn btn-secondary">Back to List</a>
 
+                {{-- Tombol Download: memanggil PayrollController@downloadSlip untuk menghasilkan PDF --}}
                 <a href="{{ route('payroll.download', $payroll->id) }}" class="btn btn-primary">
                     <i class="fas fa-file-pdf"></i> Download
                 </a>
-                
             </div>
-
         </div>
     </section>
 </div>

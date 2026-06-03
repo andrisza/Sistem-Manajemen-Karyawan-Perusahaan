@@ -1,3 +1,4 @@
+{{-- Halaman daftar pengajuan cuti — HR melihat semua, karyawan hanya melihat miliknya --}}
 @extends('layouts.dashboard')
 
 @section('content')
@@ -26,12 +27,12 @@
             </div>
         </div>
     </div>
-    
+
     <section class="section">
         <div class="card">
-            
             <div class="card-body">
 
+                {{-- Tombol tambah pengajuan cuti baru --}}
                 <div class="d-flex">
                     <a href="{{ route('leave-requests.create') }}" class="btn btn-primary mb-3 ms-auto">New Leave Request</a>
                 </div>
@@ -44,6 +45,7 @@
                             <th>Status</th>
                             <th>Start Date</th>
                             <th>End Date</th>
+                            {{-- Kolom Option hanya tampil untuk HR --}}
                             @if(session('role') == 'HR')
                             <th>Option</th>
                             @endif
@@ -54,31 +56,39 @@
                             <tr>
                                 <td>{{ $leaveRequest->employee->fullname }}</td>
                                 <td>{{ $leaveRequest->leave_type }}</td>
-                                <td>@if($leaveRequest->status == 'confirm' || $leaveRequest->status == 'approved')
-                                        <span class="text-success"> {{ ucfirst($leaveRequest->status) }}</span>
-                                    @elseif ($leaveRequest->status == 'reject')
+                                <td>
+                                    {{-- Warna badge status: hijau=disetujui, merah=ditolak, kuning=pending --}}
+                                    @if($leaveRequest->status == 'confirm' || $leaveRequest->status == 'approved')
+                                        <span class="text-success">{{ ucfirst($leaveRequest->status) }}</span>
+                                    @elseif($leaveRequest->status == 'reject')
                                         <span class="text-danger">{{ ucfirst($leaveRequest->status) }}</span>
                                     @else
                                         <span class="text-warning">{{ ucfirst($leaveRequest->status) }}</span>
                                     @endif
-                                </td>                               
+                                </td>
+                                {{-- Format tanggal: "01, Jan 2025" --}}
                                 <td>{{ \Carbon\Carbon::parse($leaveRequest->start_date)->format('d, M Y') }}</td>
                                 <td>{{ \Carbon\Carbon::parse($leaveRequest->end_date)->format('d, M Y') }}</td>
-                                    
-                                        <td>@if(session('role') == 'HR')
-                                        @if ($leaveRequest->status == 'pending' || $leaveRequest->status == 'reject')
-                                        <a href="{{ route('leave-requests.confirm', $leaveRequest->id) }}" class="btn btn-success btn-sm">Confirm</a>
+
+                                <td>
+                                    {{-- Aksi konfirmasi/penolakan dan edit/hapus hanya untuk HR --}}
+                                    @if(session('role') == 'HR')
+                                        {{-- Jika masih pending atau ditolak: tampilkan tombol Confirm; jika sudah confirm: tampilkan Reject --}}
+                                        @if($leaveRequest->status == 'pending' || $leaveRequest->status == 'reject')
+                                            <a href="{{ route('leave-requests.confirm', $leaveRequest->id) }}" class="btn btn-success btn-sm">Confirm</a>
                                         @else
-                                        <a href="{{ route('leave-requests.reject', $leaveRequest->id) }}" class="btn btn-secondary btn-sm">Reject</a>
+                                            <a href="{{ route('leave-requests.reject', $leaveRequest->id) }}" class="btn btn-secondary btn-sm">Reject</a>
                                         @endif
+
                                         <a href="{{ route('leave-requests.edit', $leaveRequest->id) }}" class="btn btn-warning btn-sm">Edit</a>
+
                                         <form action="{{ route('leave-requests.destroy', $leaveRequest->id) }}" method="POST" style="display:inline-block;">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                         </form>
-                                        @endif
-                                    </td>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

@@ -1,3 +1,4 @@
+{{-- Halaman form edit pengajuan cuti — hanya HR yang dapat mengedit --}}
 @extends('layouts.dashboard')
 
 @section('content')
@@ -26,18 +27,19 @@
             </div>
         </div>
     </div>
-    
+
     <section class="section">
         <div class="card">
-            
             <div class="card-body">
 
+                {{-- Form dikirim ke LeaveRequestController@update via PUT --}}
                 <form action="{{ route('leave-requests.update', $leaveRequest->id) }}" method="POST">
                     @csrf
                     @method('PUT')
 
                     <div class="mb-3">
                         <label for="" class="form-label">Employee</label>
+                        {{-- Dropdown semua karyawan, tandai karyawan pemilik pengajuan ini --}}
                         <select name="employee_id" id="status" class="form-control">
                             @foreach($employees as $employee)
                                 <option value="{{ $employee->id }}" {{ $leaveRequest->employees_id == $employee->id ? 'selected' : '' }}>{{ $employee->fullname }}</option>
@@ -50,10 +52,11 @@
 
                     <div class="mb-3">
                         <label for="" class="form-label">Leave Type</label>
-                        <select name="leave_type"  id="status" class="form-control">
-                                <option value="Sick Leave">{{ $leaveRequest->leave_type == 'Sick Leave' ? 'selected' : '' }}Sick Leave</option>
-                                <option value="Vacation">{{ $leaveRequest->leave_type == 'Vacation' ? 'selected' : '' }}Vacation</option>
-                                <option value="Birth Leave">{{ $leaveRequest->leave_type == 'Birth Leave' ? 'selected' : '' }}Birth Leave</option>
+                        {{-- Tampilkan tipe cuti saat ini sebagai nilai default --}}
+                        <select name="leave_type" id="status" class="form-control">
+                            <option value="Sick Leave">{{ $leaveRequest->leave_type == 'Sick Leave' ? 'selected' : '' }}Sick Leave</option>
+                            <option value="Vacation">{{ $leaveRequest->leave_type == 'Vacation' ? 'selected' : '' }}Vacation</option>
+                            <option value="Birth Leave">{{ $leaveRequest->leave_type == 'Birth Leave' ? 'selected' : '' }}Birth Leave</option>
                         </select>
                         @error('leave_type')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -62,6 +65,7 @@
 
                     <div class="mb-3">
                         <label for="" class="form-label">Start Date</label>
+                        {{-- old() mengembalikan nilai lama jika validasi gagal, atau nilai dari database --}}
                         <input type="text" class="form-control date" name="start_date" value="{{ old('start_date', $leaveRequest->start_date) }}" required>
                         @error('start_date')
                             <div class="invalid-feedback">{{ $message }}</div>

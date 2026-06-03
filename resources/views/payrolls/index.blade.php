@@ -1,84 +1,92 @@
+{{-- Halaman daftar payroll — HR melihat semua, karyawan hanya melihat miliknya sendiri --}}
 @extends('layouts.dashboard')
 
 @section('content')
-            <header class="mb-3">
-                <a href="#" class="burger-btn d-block d-xl-none">
-                    <i class="bi bi-justify fs-3"></i>
-                </a>
-            </header>
-            
-<div class="page-heading">
-    <div class="page-title">
-        <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Payroll</h3>
-                <p class="text-subtitle text-muted">Manage payrolls data</p>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Payroll</li>
-                        <li class="breadcrumb-item active" aria-current="page">Index</li>
-                    </ol>
-                </nav>
+    <header class="mb-3">
+        <a href="#" class="burger-btn d-block d-xl-none">
+            <i class="bi bi-justify fs-3"></i>
+        </a>
+    </header>
+
+    <div class="page-heading">
+        <div class="page-title">
+            <div class="row">
+                <div class="col-12 col-md-6 order-md-1 order-last">
+                    <h3>Payroll</h3>
+                    <p class="text-subtitle text-muted">Manage payrolls data</p>
+                </div>
+                <div class="col-12 col-md-6 order-md-2 order-first">
+                    <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Payroll</li>
+                            <li class="breadcrumb-item active" aria-current="page">Index</li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
         </div>
+
+        <section class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Payrolls List</h5>
+                </div>
+                <div class="card-body">
+
+                    {{-- Tombol tambah payroll baru hanya ditampilkan untuk HR --}}
+                    @if(session('role') == 'HR')
+                    <div class="d-flex">
+                        <a href="{{ route('payrolls.create') }}" class="btn btn-primary mb-3 ms-auto">New Payroll</a>
+                    </div>
+                    @endif
+
+                    {{-- Tabel daftar data penggajian --}}
+                    <table class="table table-striped" id="table1">
+                        <thead>
+                            <tr>
+                                <th>Employee</th>
+                                <th>Salary</th>
+                                <th>Deductions</th>
+                                <th>Bonuses</th>
+                                <th>Net Salary</th>
+                                <th>Pay Date</th>
+                                <th>Option</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($payrolls as $payroll)
+                            <tr>
+                                {{-- Mengakses nama karyawan via relasi employee di model Payroll --}}
+                                <td>{{ $payroll->employee->fullname }}</td>
+                                {{-- number_format() menambahkan pemisah ribuan pada angka --}}
+                                <td>{{ number_format($payroll->salary) }}</td>
+                                <td>{{ number_format($payroll->deductions) }}</td>
+                                <td>{{ number_format($payroll->bonuses) }}</td>
+                                <td>{{ number_format($payroll->net_salary) }}</td>
+                                <td>{{ $payroll->pay_date }}</td>
+                                <td>
+                                    {{-- Tombol Salary Slip: membuka halaman detail slip gaji --}}
+                                    <a href="{{ route('payrolls.show', $payroll->id) }}" class="btn btn-info btn-sm">Salary Slip</a>
+
+                                    {{-- Tombol Edit dan Delete hanya untuk HR --}}
+                                    @if(session('role') == 'HR')
+                                        <a href="{{ route('payrolls.edit', $payroll->id) }}" class="btn btn-warning btn-sm">Edit</a>
+                                        <form action="{{ route('payrolls.destroy', $payroll->id) }}" method="POST" style="display:inline;">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Delete</button>
+                                        </form>
+                                    @endif
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </section>
     </div>
-    <section class="section">
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title">
-                    Payrolls List
-                </h5>
-            </div>
-            <div class="card-body">
-
-            @if(session('role') == 'HR')
-            <div class="d-flex">
-                <a href="{{ route('payrolls.create') }}" class="btn btn-primary mb-3 ms-auto">New Payroll</a>  
-                @endif
-            </div>
-
-                <table class="table table-striped" id="table1">
-                    <thead>
-                        <tr>
-                            <th>Employee</th>
-                            <th>Salary</th>
-                            <th>Deductions</th>
-                            <th>Bonuses</th>
-                            <th>Net Salary</th>
-                            <th>Pay Date</th>
-                            <th>Option</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($payrolls as $payroll)
-                        <tr>
-                            <td>{{ $payroll->employee->fullname }}</td>
-                            <td>{{ number_format($payroll->salary) }}</td>
-                            <td>{{ number_format($payroll->deductions) }}</td>
-                            <td>{{ number_format($payroll->bonuses) }}</td>
-                            <td>{{ number_format($payroll->net_salary) }}</td>
-                            <td>{{ $payroll->pay_date }}</td>
-                            <td>
-                                <a href="{{ route('payrolls.show', $payroll->id) }}"class="btn btn-info btn-sm">Salary Slip</a>
-                                @if(session('role') == 'HR')
-                                <a href="{{ route('payrolls.edit', $payroll->id) }}"class="btn btn-warning btn-sm">Edit</a>
-                                <form action="{{ route('payrolls.destroy', $payroll->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Apakah Anda yakin ingin menghapus data ini?')">Delete</button>
-                                </form>
-                                @endif
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-</div>
 
 @endsection

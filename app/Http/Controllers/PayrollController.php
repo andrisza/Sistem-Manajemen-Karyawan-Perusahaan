@@ -8,124 +8,143 @@ use App\Models\Employee;
 use Barryvdh\DomPDF\Facade\Pdf;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
-
+// Controller untuk mengelola data Penggajian (Payroll) — semua role dapat melihat, hanya HR yang bisa kelola
 class PayrollController extends Controller
 {
+    // Menampilkan daftar data payroll sesuai role pengguna
     public function index()
-    {   
-        // PERBAIKAN DI SINI
-        if(session('role') == 'HR') {
+    {
+        if (session('role') == 'HR') {
+            // HR melihat seluruh data payroll semua karyawan
             $payrolls = Payroll::all();
         } else {
+            // Karyawan biasa hanya melihat slip gaji miliknya sendiri
             $payrolls = Payroll::where('employee_id', session('employee_id'))->get();
         }
-        
+
         return view('payrolls.index', compact('payrolls'));
     }
 
-        public function downloadSlip($id)
-        {
-            // 1. Ambil Data
-            $payroll = Payroll::with(['employee.role', 'employee.department'])->findOrFail($id);
+    // Menghasilkan dan mengunduh slip gaji dalam format PDF
+    public function downloadSlip($id)
+    {
+        // Ambil data payroll beserta relasi employee (role dan department) untuk ditampilkan di slip
+        $payroll = Payroll::with(['employee.role', 'employee.department'])->findOrFail($id);
 
-            // 2. Generate Link QR (Pastikan route 'payroll.verify' ada)
-            // Jika ragu route-nya ada atau tidak, ganti route(...) dengan string kosong '' dulu untuk tes.
-            $validationUrl = route('payroll.verify', [
-                'id' => $payroll->id, 
-                'hash' => md5($payroll->created_at . $payroll->id)
-            ]);
+        // Buat URL verifikasi yang akan dienkode sebagai QR Code di dalam slip gaji
+        $validationUrl = route('payroll.verify', [
+            'id'   => $payroll->id,
+            'hash' => md5($payroll->created_at . $payroll->id) // Hash unik untuk validasi keaslian dokumen
+        ]);
 
-            // 3. Render QR Code
-            // Menggunakan base64 agar aman masuk PDF
-            $qrcode = base64_encode(QrCode::format('svg')->size(100)->generate($validationUrl));
+        // Generate QR Code dalam format SVG, lalu encode base64 agar aman dimasukkan ke dalam PDF
+        $qrcode = base64_encode(QrCode::format('svg')->size(100)->generate($validationUrl));
 
-            // 4. Load View PDF
-            $pdf = Pdf::loadView('pages.payroll.pdf_slip', [
-                'payroll' => $payroll,
-                'employee' => $payroll->employee,
-                'qrcode' => $qrcode
-            ]);
+        // Muat view slip gaji sebagai PDF menggunakan library DomPDF
+        $pdf = Pdf::loadView('pages.payroll.pdf_slip', [
+            'payroll'  => $payroll,
+            'employee' => $payroll->employee,
+            'qrcode'   => $qrcode
+        ]);
 
-            // 5. RETURN HASILNYA (PENTING!)
-            // Pastikan nama file tidak mengandung karakter aneh
-            $filename = 'Slip-Gaji-' . str_replace(' ', '-', $payroll->employee->fullname) . '.pdf';
-            
-            return $pdf->download($filename);
-        }
+        // Buat nama file PDF yang rapi (spasi diganti tanda hubung)
+        $filename = 'Slip-Gaji-' . str_replace(' ', '-', $payroll->employee->fullname) . '.pdf';
 
+        // Langsung unduh file PDF ke browser pengguna
+        return $pdf->download($filename);
+    }
+
+    // Menampilkan form untuk membuat data payroll baru
     public function create()
-    {   
-        $employees = Employee::all();
+    {
+        $employees = Employee::all(); // Daftar karyawan untuk dropdown pilihan
         return view('payrolls.create', compact('employees'));
     }
-    public function store(Request $request) {
+
+    // Memproses dan menyimpan data payroll baru ke database
+    public function store(Request $request)
+    {
+        // Validasi input form payroll
         $request->validate([
             'employee_id' => 'required',
-            'salary' => 'required|numeric',
-            'bonuses' => 'required|numeric',
-            'deductions' => 'required|numeric',
-            'pay_date' => 'required|date'
-
+            'salary'      => 'required|numeric',
+            'bonuses'     => 'required|numeric',
+            'deductions'  => 'required|numeric',
+            'pay_date'    => 'required|date'
         ]);
+
+        // Hitung gaji bersih: gaji pokok + bonus - potongan
         $netSalary = $request->input('salary') - $request->input('deductions') + $request->input('bonuses');
 
+        // Tambahkan net_salary ke request agar ikut tersimpan
         $request->merge(['net_salary' => $netSalary]);
 
-        Payroll::create($request->all()); 
+        Payroll::create($request->all()); // Simpan ke database
+
         return redirect()->route('payrolls.index')->with('success', 'Payroll created successfully');
     }
-    public function edit(Payroll $payroll) {
-        $employees = Employee::all();
 
-        return view ('payrolls.edit', compact('payroll', 'employees'));
+    // Menampilkan form edit untuk data payroll tertentu (Route Model Binding)
+    public function edit(Payroll $payroll)
+    {
+        $employees = Employee::all(); // Daftar karyawan untuk dropdown
+        return view('payrolls.edit', compact('payroll', 'employees'));
     }
 
-    public function update(Request $request, Payroll $payroll) {
+    // Memproses dan menyimpan perubahan data payroll
+    public function update(Request $request, Payroll $payroll)
+    {
+        // Validasi input perubahan
         $request->validate([
             'employee_id' => 'required',
-            'salary' => 'required|numeric',
-            'bonuses' => 'required|numeric',
-            'deductions' => 'required|numeric',
-            'pay_date' => 'required|date'
-
+            'salary'      => 'required|numeric',
+            'bonuses'     => 'required|numeric',
+            'deductions'  => 'required|numeric',
+            'pay_date'    => 'required|date'
         ]);
+
+        // Hitung ulang gaji bersih berdasarkan nilai baru
         $netSalary = $request->input('salary') - $request->input('deductions') + $request->input('bonuses');
         $request->merge(['net_salary' => $netSalary]);
-        $payroll->update($request->all());
+
+        $payroll->update($request->all()); // Terapkan perubahan
+
         return redirect()->route('payrolls.index')->with('success', 'Payroll updated successfully');
-
     }
-    public function show(Payroll $payroll){ 
+
+    // Menampilkan halaman detail (slip gaji) untuk satu data payroll
+    public function show(Payroll $payroll)
+    {
         return view('payrolls.show', compact('payroll'));
-
     }
 
+    // Menghapus data payroll (SoftDelete)
+    public function destroy(Payroll $payroll)
+    {
+        $payroll->delete(); // Soft delete: mengisi deleted_at
 
-    public function destroy(Payroll $payroll) {
-        $payroll->delete();
-
-        return redirect()->route('payrolls.index')->with('success', 'Payroll deleted sucessfully');
+        return redirect()->route('payrolls.index')->with('success', 'Payroll deleted successfully');
     }
 
-    // --- TAMBAHKAN KODE INI ---
+    // Memverifikasi keaslian slip gaji melalui QR Code yang discan
     public function verify($id, $hash)
     {
-        // 1. Cari data payroll berdasarkan ID
+        // Cari data payroll beserta informasi karyawan berdasarkan ID
         $payroll = \App\Models\Payroll::with('employee')->findOrFail($id);
 
-        // 2. Buat ulang hash untuk dicocokkan (Logic harus sama persis dengan downloadSlip)
+        // Buat ulang hash dengan logika yang sama persis dengan saat slip diterbitkan
         $generatedHash = md5($payroll->created_at . $payroll->id);
 
-        // 3. Cek validitas
+        // Bandingkan hash dari QR Code dengan hash yang dibuat ulang
         if ($hash !== $generatedHash) {
+            // Hash tidak cocok — dokumen kemungkinan palsu atau sudah dimanipulasi
             abort(403, 'QR Code tidak valid atau dokumen palsu.');
         }
 
-        // 4. Jika valid, tampilkan halaman verifikasi
-        // Kita return view sederhana atau string dulu
+        // Hash cocok — tampilkan halaman konfirmasi keaslian dokumen
         return view('pages.payroll.verify_result', [
             'payroll' => $payroll,
-            'status' => 'valid'
+            'status'  => 'valid'
         ]);
     }
 }

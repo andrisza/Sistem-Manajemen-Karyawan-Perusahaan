@@ -1,3 +1,5 @@
+{{-- Halaman form pengajuan cuti baru --}}
+{{-- HR dapat memilih karyawan siapapun; karyawan biasa mengajukan untuk dirinya sendiri --}}
 @extends('layouts.dashboard')
 
 @section('content')
@@ -26,12 +28,12 @@
             </div>
         </div>
     </div>
-    
+
     <section class="section">
         <div class="card">
-            
             <div class="card-body">
-                
+
+                {{-- Tampilkan error validasi jika ada --}}
                 @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul>
@@ -41,13 +43,17 @@
                         </ul>
                     </div>
                 @endif
-                
+
+                {{-- Form dikirim ke LeaveRequestController@store --}}
                 <form action="{{ route('leave-requests.store') }}" method="POST">
                     @csrf
+
+                    {{-- Dropdown pilih karyawan hanya ditampilkan untuk HR --}}
+                    {{-- Karyawan biasa tidak bisa memilih employee_id — ditentukan dari session di controller --}}
                     @if(session('role') == 'HR')
                     <div class="mb-3">
                         <label for="" class="form-label">Employee</label>
-                        <select name="employee_id"  id="status" class="form-control">
+                        <select name="employee_id" id="status" class="form-control">
                             @foreach($employees as $employee)
                                 <option value="{{ $employee->id }}">{{ $employee->fullname }}</option>
                             @endforeach
@@ -60,10 +66,11 @@
 
                     <div class="mb-3">
                         <label for="" class="form-label">Leave Type</label>
-                        <select name="leave_type"  id="status" class="form-control">
-                                <option value="Sick Leave">Sick Leave</option>
-                                <option value="Vacation">Vacation</option>
-                                <option value="Birth Leave">Birth Leave</option>
+                        {{-- Pilihan jenis cuti yang tersedia --}}
+                        <select name="leave_type" id="status" class="form-control">
+                            <option value="Sick Leave">Sick Leave</option>
+                            <option value="Vacation">Vacation</option>
+                            <option value="Birth Leave">Birth Leave</option>
                         </select>
                         @error('leave_type')
                             <div class="invalid-feedback">{{ $message }}</div>
@@ -72,6 +79,7 @@
 
                     <div class="mb-3">
                         <label for="" class="form-label">Start Date</label>
+                        {{-- Class 'date' memicu Flatpickr date picker --}}
                         <input type="text" class="form-control date" name="start_date" required>
                         @error('start_date')
                             <div class="invalid-feedback">{{ $message }}</div>
