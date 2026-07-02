@@ -11,10 +11,10 @@ class RawSqlDeploySeeder extends Seeder
     public function run(): void
     {
         // Jalur menuju file SQL mentah
-        $path = database_path('sql/dump.sql');
+        $path = database_path('sql/si_obe.sql');
 
         if (File::exists($path)) {
-            $this->command->info('Sedang mengimport seluruh database lokal...');
+            $this->command->info('Sedang mengimport seluruh database locomposer dump-autoloadkal...');
             
             // Membaca isi file SQL
             $sql = File::get($path);
