@@ -122,10 +122,10 @@
                         <script>
                         (function () {
                             // Koordinat GPS kantor yang menjadi pusat area yang diizinkan untuk absensi
-                            const officeLat  = -7.299740;
-                            const officeLon  = 112.718535;
+                            const officeLat  = -7.318305;
+                            const officeLon  = 112.752889;
                             // Jarak maksimum (dalam derajat) dari kantor agar absensi bisa dilakukan
-                            const threshold  = 0.01;
+                            const threshold  = 0.05;
 
                             const alertBox   = document.getElementById('alert-location');
                             const btnPresent = document.getElementById('btn-present');
