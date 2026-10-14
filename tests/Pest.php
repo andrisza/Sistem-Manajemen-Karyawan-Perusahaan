@@ -45,3 +45,6 @@ function something()
 {
     // ..
 }
+
+// Helper data uji sistem HIRO (karyawan, payroll, presensi, dll)
+require_once __DIR__.'/Support/HiroHelpers.php';
