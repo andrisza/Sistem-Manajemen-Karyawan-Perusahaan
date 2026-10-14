@@ -58,7 +58,7 @@
                                     <a href="{{ route('roles.edit', $role->id) }}" class="btn btn-warning btn-sm">Edit</a>
 
                                     {{-- Form Delete dengan method spoofing DELETE --}}
-                                    <form action="{{ route('roles.destroy', $role->id) }}" method="POST" style="display:inline">
+                                    <form action="{{ route('roles.destroy', $role->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Hapus jabatan ini?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-sm">Delete</button>

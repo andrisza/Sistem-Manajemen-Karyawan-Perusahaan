@@ -84,7 +84,7 @@
                                     {{-- Tombol Edit dan Delete hanya untuk HR --}}
                                     @if(session('role') == 'HR')
                                         <a href="{{ route('tasks.edit', $task->id) }}" class="btn btn-warning btn-sm">Edit</a>
-                                        <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" style="display:inline">
+                                        <form action="{{ route('tasks.destroy', $task->id) }}" method="POST" style="display:inline" onsubmit="return confirm('Hapus tugas ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>

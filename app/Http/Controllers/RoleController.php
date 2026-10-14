@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Employee;
+use Illuminate\Validation\Rule;
 use App\Models\Role;
 
 // Controller untuk mengelola data Role/Jabatan (CRUD) — hanya dapat diakses oleh HR
@@ -26,7 +28,7 @@ class RoleController extends Controller
     {
         // Validasi input sebelum disimpan
         $request->validate([
-            'title'       => 'required|string|max:255', // Nama jabatan wajib diisi
+            'title'       => ['required', 'string', 'max:255', Rule::unique('roles', 'title')->whereNull('deleted_at')], // Nama jabatan wajib diisi & unik
             'description' => 'nullable|string',
         ]);
 
@@ -47,7 +49,7 @@ class RoleController extends Controller
     {
         // Validasi input perubahan
         $request->validate([
-            'title'       => 'required|string|max:255',
+            'title'       => ['required', 'string', 'max:255', Rule::unique('roles', 'title')->whereNull('deleted_at')->ignore($role->id)],
             'description' => 'nullable|string',
         ]);
 
@@ -59,6 +61,11 @@ class RoleController extends Controller
     // Menghapus jabatan dari database (SoftDelete)
     public function destroy(Role $role)
     {
+        // Integritas referensial: jabatan yang masih dipakai karyawan tidak boleh dihapus
+        if (Employee::where('role_id', $role->id)->exists()) {
+            return redirect()->route('roles.index')->with('error', 'Jabatan masih dipakai karyawan dan tidak dapat dihapus.');
+        }
+
         $role->delete(); // Soft delete: mengisi deleted_at, bukan menghapus permanen
 
         return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');

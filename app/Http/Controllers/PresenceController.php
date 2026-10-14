@@ -15,10 +15,10 @@ class PresenceController extends Controller
     {
         if (session('role') == 'HR') {
             // HR melihat seluruh data presensi semua karyawan, diurutkan terbaru
-            $presences = Presence::latest()->get();
+            $presences = Presence::with('employee')->latest()->get();
         } else {
             // Karyawan biasa hanya melihat riwayat presensi miliknya sendiri
-            $presences = Presence::where('employee_id', session('employee_id'))->latest()->get();
+            $presences = Presence::with('employee')->where('employee_id', session('employee_id'))->latest()->get();
         }
         return view('presences.index', compact('presences'));
     }

@@ -18,6 +18,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Jalankan SetSessionRole di semua route web yang sudah auth
         $middleware->appendToGroup('web', \App\Http\Middleware\SetSessionRole::class);
+
+        // Halaman yang dibuka saat login tidak disimpan cache browser (tombol Back setelah logout)
+        $middleware->appendToGroup('web', \App\Http\Middleware\PreventBackHistory::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

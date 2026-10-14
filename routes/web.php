@@ -54,22 +54,29 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile',  [ProfileController::class, 'update'])->name('profile.update'); // Proses simpan perubahan profil
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy'); // Hapus akun pengguna
 
-    // ── Modul Tugas — semua role dapat mengakses ────────────────────────────
-    Route::resource('/tasks',         TaskController::class);                                                       // CRUD tugas (index, create, store, show, edit, update, destroy)
-    Route::get('/tasks/done/{id}',    [TaskController::class, 'done'])->name('tasks.done');                        // Tandai tugas sebagai selesai
-    Route::get('/tasks/pending/{id}', [TaskController::class, 'pending'])->name('tasks.pending');                  // Kembalikan tugas ke status pending
+    // ── Aksi kelola khusus HR — didaftarkan lebih dulu agar /create tidak tertangkap route show ──
+    Route::middleware('role:HR')->group(function () {
+        Route::resource('/tasks', TaskController::class)->except(['index', 'show']);                         // HR memberi & mengelola tugas
+        Route::resource('/presences', PresenceController::class)->only(['edit', 'update', 'destroy']);       // Koreksi presensi oleh HR
+        Route::resource('payrolls', PayrollController::class)->except(['index', 'show']);                    // Kelola payroll
+    });
 
-    // ── Modul Presensi — semua role dapat mengakses ─────────────────────────
-    Route::resource('/presences',      PresenceController::class);                                                  // CRUD presensi
+    // ── Modul Tugas — semua role dapat melihat tugasnya ─────────────────────
+    Route::resource('/tasks',         TaskController::class)->only(['index', 'show']);                             // Daftar & detail tugas
+    Route::get('/tasks/done/{id}',    [TaskController::class, 'done'])->name('tasks.done')->whereNumber('id');     // Tandai tugas sebagai selesai
+    Route::get('/tasks/pending/{id}', [TaskController::class, 'pending'])->name('tasks.pending')->whereNumber('id'); // Kembalikan tugas ke status pending
+
+    // ── Modul Presensi — semua role dapat check-in / check-out ──────────────
+    Route::resource('/presences',      PresenceController::class)->only(['index', 'create', 'store']);             // Riwayat & check-in presensi
     Route::post('/presences/checkout', [PresenceController::class, 'checkout'])->name('presences.checkout');       // Proses check-out karyawan
 
-    // ── Modul Payroll — semua role dapat melihat, hanya HR yang bisa kelola ─
-    Route::resource('payrolls', PayrollController::class);                                                         // CRUD payroll
-    Route::get('/payroll/{id}/download',      [PayrollController::class, 'downloadSlip'])->name('payroll.download'); // Unduh slip gaji PDF
-    Route::get('/payroll/verify/{id}/{hash}', [PayrollController::class, 'verify'])->name('payroll.verify');        // Verifikasi keaslian slip via QR Code
+    // ── Modul Payroll — semua role dapat melihat miliknya ───────────────────
+    Route::resource('payrolls', PayrollController::class)->only(['index', 'show']);                                // Daftar & detail payroll
+    Route::get('/payroll/{id}/download',      [PayrollController::class, 'downloadSlip'])->name('payroll.download')->whereNumber('id'); // Unduh slip gaji PDF
+    Route::get('/payroll/verify/{id}/{hash}', [PayrollController::class, 'verify'])->name('payroll.verify')->whereNumber('id');     // Verifikasi keaslian slip via QR Code
 
     // ── Modul Cuti — semua role dapat mengakses ─────────────────────────────
-    Route::resource('leave-requests', LeaveRequestController::class);                                              // CRUD pengajuan cuti
+    Route::resource('leave-requests', LeaveRequestController::class)->except(['show']);                           // CRUD pengajuan cuti
 
     // ── Fitur Eksklusif HR — hanya role 'HR' yang boleh akses ───────────────
     // Middleware 'role:HR' akan menolak akses jika session role bukan 'HR'
@@ -78,6 +85,6 @@ Route::middleware('auth')->group(function () {
     Route::resource('/roles',       RoleController::class)->middleware('role:HR');       // CRUD jabatan
 
     // Aksi konfirmasi dan penolakan pengajuan cuti — hanya HR
-    Route::get('/leave-requests/confirm/{id}', [LeaveRequestController::class, 'confirm'])->name('leave-requests.confirm')->middleware('role:HR'); // Setujui cuti
-    Route::get('/leave-requests/reject/{id}',  [LeaveRequestController::class, 'reject'])->name('leave-requests.reject')->middleware('role:HR');   // Tolak cuti
+    Route::get('/leave-requests/confirm/{id}', [LeaveRequestController::class, 'confirm'])->name('leave-requests.confirm')->middleware('role:HR')->whereNumber('id'); // Setujui cuti
+    Route::get('/leave-requests/reject/{id}',  [LeaveRequestController::class, 'reject'])->name('leave-requests.reject')->middleware('role:HR')->whereNumber('id');   // Tolak cuti
 });

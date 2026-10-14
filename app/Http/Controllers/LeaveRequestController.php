@@ -14,10 +14,10 @@ class LeaveRequestController extends Controller
     {
         if (session('role') == 'HR') {
             // HR melihat semua pengajuan cuti dari seluruh karyawan
-            $leaveRequests = LeaveRequest::all();
+            $leaveRequests = LeaveRequest::with('employee')->get();
         } else {
             // Karyawan biasa hanya melihat pengajuan cuti miliknya sendiri
-            $leaveRequests = LeaveRequest::where('employee_id', session('employee_id'))->get();
+            $leaveRequests = LeaveRequest::with('employee')->where('employee_id', session('employee_id'))->get();
         }
         return view('leave-requests.index', compact('leaveRequests'));
     }
@@ -59,6 +59,8 @@ class LeaveRequestController extends Controller
     // Menampilkan form edit untuk pengajuan cuti tertentu (Route Model Binding)
     public function edit(LeaveRequest $leaveRequest)
     {
+        $this->pastikanMilikSendiriAtauHR($leaveRequest->employee_id);
+
         $employees = Employee::all(); // Daftar karyawan untuk dropdown
         return view('leave-requests.edit', compact('leaveRequest', 'employees'));
     }
@@ -66,6 +68,13 @@ class LeaveRequestController extends Controller
     // Memproses dan menyimpan perubahan data pengajuan cuti
     public function update(Request $request, LeaveRequest $leaveRequest)
     {
+        $this->pastikanMilikSendiriAtauHR($leaveRequest->employee_id);
+
+        // Karyawan biasa tidak boleh memindahkan pengajuan ke karyawan lain
+        if (session('role') != 'HR') {
+            $request->merge(['employee_id' => $leaveRequest->employee_id]);
+        }
+
         // Validasi input perubahan
         $request->validate([
             'employee_id' => 'required',
@@ -73,7 +82,7 @@ class LeaveRequestController extends Controller
             'start_date'  => 'required|date',
             'end_date'    => 'required|date',
         ]);
-        $leaveRequest->update($request->all()); // Terapkan perubahan
+        $leaveRequest->update($request->only(['employee_id', 'leave_type', 'start_date', 'end_date'])); // Terapkan perubahan (status hanya diubah lewat confirm/reject)
 
         return redirect()->route('leave-requests.index')->with('success', 'Leave Request updated Successfully');
     }
@@ -99,6 +108,8 @@ class LeaveRequestController extends Controller
     // Menghapus pengajuan cuti dari database (SoftDelete)
     public function destroy(LeaveRequest $leaveRequest)
     {
+        $this->pastikanMilikSendiriAtauHR($leaveRequest->employee_id);
+
         $leaveRequest->delete(); // Soft delete: mengisi deleted_at
 
         return redirect()->route('leave-requests.index')->with('success', 'Leave Request deleted Successfully');

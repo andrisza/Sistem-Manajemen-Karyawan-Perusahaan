@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\AccountInvitation;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use App\Models\Employee;
 use App\Models\Department;
 use App\Models\Role;
@@ -39,12 +41,12 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             'fullname'      => 'required|string|max:255',
             'email'         => 'required|email|unique:employees,email|unique:users,email',
-            'phone_number'  => 'nullable|string|max:20',
+            'phone_number'  => 'required|string|max:20',
             'address'       => 'required|string|max:255',
             'birth_date'    => 'required|date',
             'hire_date'     => 'required|date',
-            'department_id' => 'required',
-            'role_id'       => 'required',
+            'department_id' => ['required', Rule::exists('departments', 'id')->whereNull('deleted_at')],
+            'role_id'       => ['required', Rule::exists('roles', 'id')->whereNull('deleted_at')],
             'status'        => 'required|string',
             'salary'        => 'nullable|numeric',
         ]);
@@ -77,9 +79,14 @@ class EmployeeController extends Controller
 
             return redirect()->route('employees.index')
                             ->with('success', 'Employee created successfully. Invitation email has been sent!');
+        } catch (TransportExceptionInterface $e) {
+            DB::rollback(); // Email gagal terkirim — batalkan agar bisa diulang dengan data yang sama
+            report($e);
+            return back()->withInput()->withErrors(['error' => 'Gagal mengirim email aktivasi. Data belum disimpan, silakan coba lagi.']);
         } catch (\Exception $e) {
             DB::rollback(); // Ada error — batalkan semua perubahan
-            return back()->withInput()->withErrors(['error' => 'Gagal membuat data: ' . $e->getMessage()]);
+            report($e);     // Detail teknis hanya dicatat di log, tidak ditampilkan ke pengguna
+            return back()->withInput()->withErrors(['error' => 'Gagal membuat data karyawan. Silakan coba lagi.']);
         }
     }
 
@@ -110,8 +117,8 @@ class EmployeeController extends Controller
             'address'       => 'nullable|string|max:255',
             'birth_date'    => 'required|date',
             'hire_date'     => 'required|date',
-            'department_id' => 'required',
-            'role_id'       => 'required',
+            'department_id' => ['required', Rule::exists('departments', 'id')->whereNull('deleted_at')],
+            'role_id'       => ['required', Rule::exists('roles', 'id')->whereNull('deleted_at')],
             'status'        => 'required|string',
             'salary'        => 'required|numeric',
         ]);
@@ -140,7 +147,8 @@ class EmployeeController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withInput()->withErrors(['error' => 'Gagal mengupdate data: ' . $e->getMessage()]);
+            report($e);
+            return back()->withInput()->withErrors(['error' => 'Gagal mengupdate data karyawan. Silakan coba lagi.']);
         }
     }
 
@@ -171,7 +179,8 @@ class EmployeeController extends Controller
 
         } catch (\Exception $e) {
             DB::rollback();
-            return back()->withErrors(['error' => 'Gagal menghapus data: ' . $e->getMessage()]);
+            report($e);
+            return back()->withErrors(['error' => 'Gagal menghapus data karyawan. Silakan coba lagi.']);
         }
     }
 }

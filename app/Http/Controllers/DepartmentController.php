@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Employee;
+use Illuminate\Validation\Rule;
 use App\Models\Department;
 
 // Controller untuk mengelola data Departemen (CRUD) — hanya dapat diakses oleh HR
@@ -26,7 +28,7 @@ class DepartmentController extends Controller
     {
         // Validasi input dari form sebelum disimpan
         $request->validate([
-            'name'        => 'required|string|max:255',
+            'name'        => ['required', 'string', 'max:255', Rule::unique('departments', 'name')->whereNull('deleted_at')],
             'description' => 'nullable|string',
             'status'      => 'required|string|max:50', // 'active' atau 'inactive'
         ]);
@@ -50,7 +52,7 @@ class DepartmentController extends Controller
     {
         // Validasi input perubahan
         $request->validate([
-            'name'        => 'required|string|max:255',
+            'name'        => ['required', 'string', 'max:255', Rule::unique('departments', 'name')->whereNull('deleted_at')->ignore($id)],
             'description' => 'nullable|string',
             'status'      => 'required|string|max:50',
         ]);
@@ -65,6 +67,12 @@ class DepartmentController extends Controller
     public function destroy($id)
     {
         $department = Department::findOrFail($id); // Cari departemen yang akan dihapus
+
+        // Integritas referensial: departemen yang masih berisi karyawan tidak boleh dihapus
+        if (Employee::where('department_id', $department->id)->exists()) {
+            return redirect()->route('departments.index')->with('error', 'Departemen masih memiliki karyawan dan tidak dapat dihapus.');
+        }
+
         $department->delete(); // Soft delete: kolom deleted_at diisi, bukan dihapus permanen
 
         return redirect()->route('departments.index')->with('success', 'Department deleted successfully.');

@@ -82,7 +82,7 @@
 
                                         <a href="{{ route('leave-requests.edit', $leaveRequest->id) }}" class="btn btn-warning btn-sm">Edit</a>
 
-                                        <form action="{{ route('leave-requests.destroy', $leaveRequest->id) }}" method="POST" style="display:inline-block;">
+                                        <form action="{{ route('leave-requests.destroy', $leaveRequest->id) }}" method="POST" style="display:inline-block;" onsubmit="return confirm('Hapus pengajuan cuti ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>

@@ -14,10 +14,10 @@ class TaskController extends Controller
     {
         if (session('role') == 'HR') {
             // HR melihat semua tugas di seluruh perusahaan
-            $tasks = Task::all();
+            $tasks = Task::with('employee')->get();
         } else {
             // Karyawan biasa hanya melihat tugas yang ditugaskan kepada dirinya
-            $tasks = Task::where('assigned_to', session('employee_id'))->get();
+            $tasks = Task::with('employee')->where('assigned_to', session('employee_id'))->get();
         }
         return view('tasks.index', compact('tasks'));
     }
@@ -49,6 +49,8 @@ class TaskController extends Controller
     // Menampilkan detail tugas tertentu (Route Model Binding)
     public function show(Task $task)
     {
+        $this->pastikanMilikSendiriAtauHR($task->assigned_to);
+
         return view('tasks.show', compact('task'));
     }
 
@@ -79,7 +81,8 @@ class TaskController extends Controller
     // Mengubah status tugas menjadi 'done' (selesai) — dipanggil dari tombol "Mark as Done"
     public function done(int $id)
     {
-        $task = Task::find($id);
+        $task = Task::findOrFail($id);
+        $this->pastikanMilikSendiriAtauHR($task->assigned_to);
         $task->update(['status' => 'done']); // Set status langsung ke 'done'
 
         return redirect()->route('tasks.index')->with('success', 'Task marked as done.');
@@ -88,7 +91,8 @@ class TaskController extends Controller
     // Mengubah status tugas menjadi 'pending' — dipanggil dari tombol "Mark as Pending"
     public function pending(int $id)
     {
-        $task = Task::find($id);
+        $task = Task::findOrFail($id);
+        $this->pastikanMilikSendiriAtauHR($task->assigned_to);
         $task->update(['status' => 'pending']); // Kembalikan status ke 'pending'
 
         return redirect()->route('tasks.index')->with('success', 'Task marked as pending.');
